@@ -20,8 +20,22 @@ export default function Codex({ optimizations }) {
     <>
       <Head>
         <title>
-          Advanced Next.js, React, Node.js & API Development Tips | Alberto Muñoz
+          Advanced Next.js, React, Node.js & API Development Tips | Alberto
+          Muñoz
         </title>
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
+        <link rel="icon" href="/favicon.ico" />
         <meta
           name="description"
           content="Explore cutting-edge tips and best practices for Next.js, React, Node.js, and API development. Level up your web projects with expert insights."
