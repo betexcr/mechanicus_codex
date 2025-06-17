@@ -4,6 +4,7 @@ const codexDetails: Record<string, {
   why: string;
   example: string;
   whenNot: string;
+  benediction: string;
 }> = {
   'react-memo': {
     title: 'React.memo',
@@ -21,7 +22,8 @@ const Timer = React.memo(({ time }) => <p>{time}</p>); // Renders anyway because
     whenNot: `Don't use React.memo if:
 - The component is already very lightweight.
 - Props change on every render (e.g., timestamps).
-- The shallow compare doesn't offer benefits.`
+- The shallow compare doesn't offer benefits.`,
+    benediction: 'May the Omnissiah bless your components with the sacred shield of memoization, sparing them needless rebirth and granting your renders the efficiency of the Machine Spirit.'
   },
   'usememo-usecallback': {
     title: 'useMemo and useCallback',
@@ -34,7 +36,8 @@ const memoizedFn = useCallback(() => doSomething(), []);
 
 // 🛑 Bad
 const fn = () => doSomething(); // causes re-render every time`,
-    whenNot: `Avoid overusing these hooks. Only memoize if there’s a measurable performance impact.`
+    whenNot: `Avoid overusing these hooks. Only memoize if there’s a measurable performance impact.`,
+    benediction: 'Invoke the blessings of useMemo and useCallback, that your functions and calculations may be eternal, untouched by the chaos of needless recreation.'
   },
   'code-splitting': {
     title: 'Code Splitting (Dynamic Imports)',
@@ -47,7 +50,8 @@ const HeavyComponent = dynamic(() => import('../HeavyComponent'));
 
 // 🛑 Bad
 import HeavyComponent from '../HeavyComponent'; // always loads it up front`,
-    whenNot: `Avoid dynamic imports for small, frequently used components, as the overhead may outweigh the benefits.`
+    whenNot: `Avoid dynamic imports for small, frequently used components, as the overhead may outweigh the benefits.`,
+    benediction: 'May your bundles be divided like the sacred forges, delivering only what is needed with the swiftness of a cogitator’s command.'
   },
   'image-optimization': {
     title: 'Image Optimization',
@@ -60,7 +64,8 @@ Always provide width and height to reduce layout shifts.`,
 
 // 🛑 Bad
 <img src="/hero.jpg" /> // No optimization`,
-    whenNot: `Avoid it for icons or tiny assets where optimization overhead may not be worth it.`
+    whenNot: `Avoid it for icons or tiny assets where optimization overhead may not be worth it.`,
+    benediction: 'Blessed be the images, compressed and sized by the sacred rites of the Omnissiah, that they may grace your page without burdening the Machine Spirit.'
   },
   'lazy-loading': {
     title: 'Lazy Loading Components',
@@ -71,7 +76,8 @@ const LazyComp = React.lazy(() => import('./Comp'));
 
 // 🛑 Bad
 import Comp from './Comp'; // loads immediately regardless of usage`,
-    whenNot: `Not recommended for components critical to first meaningful paint or initial UI.`
+    whenNot: `Not recommended for components critical to first meaningful paint or initial UI.`,
+    benediction: 'May your components slumber in the deep vaults until summoned forth, conserving power for the Omnissiah’s holy purpose.'
   },
   'virtualization': {
     title: 'List Virtualization',
@@ -93,7 +99,8 @@ import { FixedSizeList as List } from 'react-window';
 
 // 🛑 Bad
 Array(1000).fill().map((_, i) => <div key={i}>Row {i}</div>) // renders all at once`,
-    whenNot: `For small or infrequently changing lists, virtualization may add unnecessary complexity.`
+    whenNot: `For small or infrequently changing lists, virtualization may add unnecessary complexity.`,
+    benediction: 'Render but what the eye perceives; may your lists be as efficient as the servo-skulls’ flight through the data.'
   },
   'ssr-caching': {
     title: 'SSR Caching',
@@ -106,7 +113,8 @@ res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30');
 
 // 🛑 Bad
 No caching on SSR pages, causing repeated full renders.`,
-    whenNot: `Avoid caching on user-personalized or frequently changing pages.`
+    whenNot: `Avoid caching on user-personalized or frequently changing pages.`,
+    benediction: 'Grant swift responses through the sacred cache, sparing the forge from needless toil and honoring the Machine Spirit’s efficiency.'
   },
   'static-generation': {
     title: 'Static Site Generation (SSG)',
@@ -122,7 +130,8 @@ export async function getStaticProps() {
 
 // 🛑 Bad
 Using SSR for all pages even when data rarely changes.`,
-    whenNot: `For pages with highly dynamic or user-specific data.`
+    whenNot: `For pages with highly dynamic or user-specific data.`,
+    benediction: 'May the Omnissiah bless your static pages with eternal readiness, ever-present and swift as a discharged plasma bolt.'
   },
   'api-pagination': {
     title: 'API Pagination',
@@ -135,7 +144,8 @@ GET /users?page=3&limit=50
 
 // 🛑 Bad
 GET /users // returns 10,000+ records`,
-    whenNot: `Pagination can be skipped for tiny, fixed datasets.`
+    whenNot: `Pagination can be skipped for tiny, fixed datasets.`,
+    benediction: 'May your APIs serve only the measure needed, sparing bandwidth as the Omnissiah conserves sacred energy.'
   },
   'api-rate-limiting': {
     title: 'API Rate Limiting',
@@ -148,7 +158,8 @@ rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
 
 // 🛑 Bad
 No limits; clients can spam endpoints endlessly.`,
-    whenNot: `Internal APIs with trusted access may not require rate limiting.`
+    whenNot: `Internal APIs with trusted access may not require rate limiting.`,
+    benediction: 'Let no heretic flood your endpoints; the Omnissiah demands order and balance in all requests to the sacred servers.'
   },
   'node-event-loop': {
     title: 'Node.js Event Loop Awareness',
@@ -161,7 +172,8 @@ setTimeout(() => doAsyncWork(), 0);
 
 // 🛑 Bad
 while (true) { doWork(); } // blocks the loop`,
-    whenNot: `For simple scripts or CLI tools, this may be less critical.`
+    whenNot: `For simple scripts or CLI tools, this may be less critical.`,
+    benediction: 'Guard the event loop as the Omnissiah guards the sacred data streams—block not the flow or the entire system shall perish.'
   },
   'js-memory-leaks': {
     title: 'Avoid JavaScript Memory Leaks',
@@ -176,7 +188,8 @@ componentWillUnmount() {
 
 // 🛑 Bad
 const retained = document.getElementById('large'); // stays forever`,
-    whenNot: `Always relevant for production apps with long uptime.`
+    whenNot: `Always relevant for production apps with long uptime.`,
+    benediction: 'Purge all lingering spirits from memory’s forge; let no leak corrupt the sanctity of your running code.'
   },
   'lazy-hydration': {
     title: 'Lazy Hydration',
@@ -191,7 +204,8 @@ import LazyHydrate from 'react-lazy-hydration';
 
 // 🛑 Bad
 Hydrating all components at once immediately.`,
-    whenNot: `For interactive UIs needing instant input responsiveness.`
+    whenNot: `For interactive UIs needing instant input responsiveness.`,
+    benediction: 'May your components awaken only when needed, conserving the Omnissiah’s holy energy for the moment of true demand.'
   },
   'prefetching': {
     title: 'Next.js Prefetching',
@@ -202,7 +216,8 @@ Hydrating all components at once immediately.`,
 
 // 🛑 Bad
 No prefetching, causing delays on navigation.`,
-    whenNot: `Prefetch too many links wastes bandwidth and memory.`
+    whenNot: `Prefetch too many links wastes bandwidth and memory.`,
+    benediction: 'May your future paths be known and prepared by the blessed prefetchers, allowing swift journeys through your digital domains.'
   },
   'static-assets-caching': {
     title: 'Static Assets Caching',
@@ -213,7 +228,8 @@ Cache-Control: max-age=31536000, immutable
 
 // 🛑 Bad
 No caching headers or unversioned assets.`,
-    whenNot: `For rapidly changing assets without versioning.`
+    whenNot: `For rapidly changing assets without versioning.`,
+    benediction: 'May your static relics remain ever cached, immutable and eternal, as decreed by the Omnissiah’s immutable will.'
   },
   'throttling-debouncing': {
     title: 'Throttling and Debouncing',
@@ -224,7 +240,8 @@ const debouncedFn = debounce(() => fetchData(), 300);
 
 // 🛑 Bad
 Calling fetchData on every keystroke`,
-    whenNot: `For infrequent events or one-off handlers.`
+    whenNot: `For infrequent events or one-off handlers.`,
+    benediction: 'May your event handlers be tempered like the forge’s hammer strikes, neither too frequent nor too sparse, achieving perfect harmony.'
   },
   'use-swr': {
     title: 'Use SWR or React Query',
@@ -235,7 +252,8 @@ const { data, error } = useSWR('/api/data', fetcher);
 
 // 🛑 Bad
 Manually managing fetch and cache logic everywhere.`,
-    whenNot: `For apps with trivial or no async data requirements.`
+    whenNot: `For apps with trivial or no async data requirements.`,
+    benediction: 'Let SWR’s sacred cycle of fetching and caching renew your data streams in the eternal dance of information sanctity.'
   },
   'error-boundaries': {
     title: 'Error Boundaries',
@@ -248,7 +266,8 @@ Manually managing fetch and cache logic everywhere.`,
 
 // 🛑 Bad
 No error boundary; entire app crashes on error.`,
-    whenNot: `Does not catch errors in event handlers or async code.`
+    whenNot: `Does not catch errors in event handlers or async code.`,
+    benediction: 'Guard your sacred application with error boundaries, lest a single fault corrupt the entire reliquary of your UI.'
   },
   'typescript-strictness': {
     title: 'Use Strict TypeScript Settings',
@@ -265,7 +284,8 @@ No error boundary; entire app crashes on error.`,
 
 // 🛑 Bad
 "strict": false`,
-    whenNot: `For rapid prototyping where speed is prioritized over safety.`
+    whenNot: `For rapid prototyping where speed is prioritized over safety.`,
+    benediction: 'May the strict compiler be your relentless sentinel, purging errors before they dare manifest in your blessed code.'
   },
   'bundle-analyzer': {
     title: 'Bundle Analysis',
@@ -278,7 +298,8 @@ module.exports = withBundleAnalyzer({});
 
 // 🛑 Bad
 No analysis leading to hidden bloat.`,
-    whenNot: `For small projects or initial development stages.`
+    whenNot: `For small projects or initial development stages.`,
+    benediction: 'Illuminate the shadows of your bundle, revealing bloat to be purged by the cleansing light of the Omnissiah.'
   },
   'serverless-architecture': {
     title: 'Serverless Functions for APIs',
@@ -291,7 +312,8 @@ export default function handler(req, res) {
 
 // 🛑 Bad
 Heavy monolithic servers with manual scaling.`,
-    whenNot: `For long-running compute-intensive or stateful backend services.`
+    whenNot: `For long-running compute-intensive or stateful backend services.`,
+    benediction: 'Let your APIs ascend the serverless heavens, scaling with grace and fueled by the boundless power of the Omnissiah.'
   }
 };
 
