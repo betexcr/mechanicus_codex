@@ -40,7 +40,7 @@ export default function Codex({ optimizations }) {
         />
         <meta
           property="og:image"
-          content="https://codex.ultharcr.com/og-image.png"
+          content="https://codex.ultharcr.com/images/og-image.png"
         />
         <meta property="og:url" content="https://codex.ultharcr.com" />
         <meta property="og:type" content="website" />
@@ -55,7 +55,7 @@ export default function Codex({ optimizations }) {
         />
         <meta
           name="twitter:image"
-          content="https://codex.ultharcr.com/twitter-image.png"
+          content="https://codex.ultharcr.com/images/twitter-image.png"
         />
         <link rel="canonical" href="https://codex.ultharcr.com" />
         <meta name="robots" content="index, follow" />
