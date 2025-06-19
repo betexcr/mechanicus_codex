@@ -41,7 +41,7 @@ export default function App({ Component, pageProps }: AppProps) {
         />
         <meta
           property="og:image"
-          content="https://codex.ultharcr.com/images/og-image.png"
+          content="https://codex.ultharcr.com/images/og-image.jpg"
         />
         <meta property="og:url" content="https://codex.ultharcr.com" />
         <meta property="og:type" content="website" />
@@ -56,7 +56,7 @@ export default function App({ Component, pageProps }: AppProps) {
         />
         <meta
           name="twitter:image"
-          content="https://codex.ultharcr.com/images/twitter-image.png"
+          content="https://codex.ultharcr.com/images/twitter-image.jpg"
         />
         <link rel="canonical" href="https://codex.ultharcr.com" />
         <meta name="robots" content="index, follow" />
