@@ -1,4 +1,3 @@
-import SideNav from "../../components/SideNav";
 import { motion } from "framer-motion";
 import codexDetails from "../../data/codexDetails";
 import { useRouter } from "next/router";
@@ -20,9 +19,8 @@ export default function CodexDetail() {
   if (!data) return <p className="text-white p-10">Scroll not found...</p>;
 
   return (
-    <div className="flex bg-black min-h-screen text-red-200">
-      <SideNav />
-      <main className={`flex-1 p-8 ${shareTech.className} overflow-auto`}>
+    <div className="bg-black min-h-screen text-red-200">
+      <main className={`p-8 ${shareTech.className} overflow-auto`}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

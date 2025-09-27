@@ -1,10 +1,13 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import Head from "next/head";
+import Header from "@/components/Header";
+import LoadingIndicator from "@/components/LoadingIndicator";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
+      <Header />
       <Head>
         <title>
           Advanced Next.js, React, Node.js & API Development Tips | Alberto
@@ -98,6 +101,7 @@ export default function App({ Component, pageProps }: AppProps) {
         />
       </Head>
       <Component {...pageProps} />
+      <LoadingIndicator />
     </>
   );
 }
