@@ -2,7 +2,10 @@ import { motion } from "framer-motion";
 import codexDetails from "../../data/codexDetails";
 import { useRouter } from "next/router";
 import { Share_Tech_Mono } from "next/font/google";
+import tipQuotes from "../../data/tipQuotes";
 import Link from "next/link";
+import { useLoading } from "../../components/LoadingContext";
+import { useEffect } from "react";
 
 const shareTech = Share_Tech_Mono({ subsets: ["latin"], weight: "400" });
 
@@ -10,6 +13,15 @@ export default function CodexDetail() {
   const router = useRouter();
   const { slug } = router.query;
   const slugStr = Array.isArray(slug) ? slug[0] : slug ?? "";
+  const { setLoading } = useLoading();
+
+  useEffect(() => {
+    if (!slugStr) {
+      setLoading(true);
+    } else {
+      setLoading(false);
+    }
+  }, [slugStr, setLoading]);
 
   if (!slugStr)
     return <p className="text-white p-10">Loading sacred scroll...</p>;
@@ -27,7 +39,10 @@ export default function CodexDetail() {
           transition={{ duration: 0.4 }}
           className="max-w-4xl mx-auto border border-red-700 p-8 rounded-2xl bg-gray-950 shadow-lg"
         >
-          <h1 className="text-3xl text-red-400 mb-4 font-bold">{data.title}</h1>
+          <h1 className="text-3xl text-red-400 mb-2 font-bold">{data.title}</h1>
+          {tipQuotes[slugStr] && (
+            <p className="text-sm text-red-300 italic mb-3">{tipQuotes[slugStr]}</p>
+          )}
           <p className="text-sm mb-4 text-gray-300 italic">{data.summary}</p>
 
           <section className="mb-6">

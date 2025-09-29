@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import codexDetails from '../data/codexDetails';
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Menu, X, ChevronRight, Home } from 'lucide-react';
+import tipQuotes from '../data/tipQuotes';
 
 // Technology categories based on the codex content
 const technologyCategories = {
@@ -54,16 +55,108 @@ const technologyCategories = {
     'python-multiprocessing-threading',
     'python-generators-lazy-evaluation'
   ],
-  'Web Development Basics': [
-    'web-fundamentals-html',
-    'web-fundamentals-css',
-    'web-fundamentals-javascript',
-    'web-development-tools',
-    'web-development-frameworks',
-    'web-development-backend',
-    'web-development-practice'
-  ]
+  'Java': [
+    'java-gc-tuning',
+    'java-jit-optimizations',
+    'java-threading-concurrency',
+    'java-spring-boot-performance',
+    'java-memory-profiling',
+    'java-graalvm-native-image',
+    'java-reactive-programming'
+  ],
+  
 };
+
+// Tech-Priest quotes per technique (deterministic, category-aware)
+const slugGroups = {
+  react: ['react-memo','usememo-usecallback','lazy-loading','virtualization','lazy-hydration','error-boundaries','react-concurrent-features','react-server-components'],
+  next: ['code-splitting','image-optimization','ssr-caching','static-generation','prefetching','static-assets-caching','nextjs-streaming','nextjs-partial-prerendering'],
+  performance: ['throttling-debouncing','use-swr','bundle-analyzer','static-assets-caching'],
+  node: ['api-pagination','api-rate-limiting','node-event-loop','js-memory-leaks','serverless-architecture','nodejs-worker-threads','nodejs-cluster-optimization'],
+  typescript: ['typescript-strictness','typescript-satisfies-operator','typescript-template-literal-types'],
+  python: ['python-async-optimization','python-memory-optimization','python-efficient-data-structures','python-profiling-performance','python-numpy-optimization','python-multiprocessing-threading','python-generators-lazy-evaluation'],
+  web: ['web-fundamentals-html','web-fundamentals-css','web-fundamentals-javascript','web-development-tools','web-development-frameworks','web-development-backend','web-development-practice']
+};
+
+function hashSlug(slug: string) {
+  let h = 0;
+  for (let i = 0; i < slug.length; i++) h = (h + slug.charCodeAt(i)) % 2147483647;
+  return h;
+}
+
+function getCategoryForSlug(slug: string) {
+  if (slugGroups.react.includes(slug)) return 'react';
+  if (slugGroups.next.includes(slug)) return 'next';
+  if (slugGroups.performance.includes(slug)) return 'performance';
+  if (slugGroups.node.includes(slug)) return 'node';
+  if (slugGroups.typescript.includes(slug)) return 'typescript';
+  if (slugGroups.python.includes(slug)) return 'python';
+  if (slugGroups.web.includes(slug)) return 'web';
+  return 'misc';
+}
+
+function getTechPriestQuote(slug: string, title: string) {
+  const category = getCategoryForSlug(slug);
+  const seed = hashSlug(slug);
+  const pick = (arr: string[]) => arr[seed % arr.length];
+  const invocations = [
+    '“By the Omnissiah,',
+    '“Machine-Spirit willing,',
+    '“In the sacred stacks,',
+    '“Let the data-choirs sing,',
+    '“Under red-lit forges,'
+  ];
+  const closures = [
+    'so efficiency prevails.”',
+    'and entropy is denied.”',
+    'that latency may fall.”',
+    'granting ordered execution.”',
+    'and throughput is sanctified.”'
+  ];
+
+  const banks = {
+    react: {
+      verbs: ['quiets re-renders','stills jitter','aligns fibers','pacifies props','guards state'],
+      nouns: ['the UI engine','component hymnals','virtual DOM','render-spirits','hook liturgy']
+    },
+    next: {
+      verbs: ['lightens payloads','prepares routes','parts the bundle','streams fragments','hastens TTFB'],
+      nouns: ['edge shrines','CDN reliquaries','route-spirits','page forges','cache altars']
+    },
+    performance: {
+      verbs: ['purges bloat','sharpens frames','tempers cycles','culls excess','steadies motion'],
+      nouns: ['frame cadence','timing reliquary','performance dials','render cadence','sacred loops']
+    },
+    node: {
+      verbs: ['keeps the loop','orders daemons','guards the port','untangles I/O','balances load'],
+      nouns: ['server-forge','worker cohorts','event conduits','daemon-processes','socket temples']
+    },
+    typescript: {
+      verbs: ['seals contracts','banishes bugs','fortifies types','guards interfaces','marks invariants'],
+      nouns: ['runes of type','compiler shrine','schema tablets','type reliquary','interface sigils']
+    },
+    python: {
+      verbs: ['tames async','conserves memory','vectorizes rites','profiles truth','spawns workers'],
+      nouns: ['serpent loops','heap basin','numeric arrays','hot paths','process choir']
+    },
+    web: {
+      verbs: ['honors semantics','shapes layout','enlightens novices','arms artisans','orders content'],
+      nouns: ['markup rites','responsive grid','learning walkway','tool sanctum','document spine']
+    },
+    misc: {
+      verbs: ['restores order','aligns circuits','cleanses drift','binds chaos','keeps harmony'],
+      nouns: ['data conduits','logic cogs','control rails','state gears','code reliquary']
+    }
+  } as const;
+
+  const kit = (banks as any)[category] || (banks as any).misc;
+  const invocation = pick(invocations);
+  const verb = pick(kit.verbs);
+  const noun = pick(kit.nouns);
+  const closure = pick(closures);
+
+  return `${invocation} ${title} ${verb} within ${noun}, ${closure}`;
+}
 
 export default function Header() {
   const router = useRouter();
@@ -155,13 +248,16 @@ export default function Header() {
               <ChevronRight size={14} />
               <div 
                 className="relative"
-                ref={el => breadcrumbRefs.current[currentTechInfo.category] = el}
+                ref={el => { breadcrumbRefs.current[currentTechInfo.category] = el; }}
                 onMouseEnter={() => handleBreadcrumbHover(currentTechInfo.category)}
                 onMouseLeave={handleBreadcrumbLeave}
               >
-                <span className="text-red-400 font-medium cursor-pointer hover:text-red-300 transition-colors">
+                <Link 
+                  href={`/category/${currentTechInfo.category.toLowerCase().replace(/\s+/g, '-')}`}
+                  className="text-red-400 font-medium cursor-pointer hover:text-red-300 transition-colors"
+                >
                   {currentTechInfo.category}
-                </span>
+                </Link>
                 
                 {/* Breadcrumb Dropdown */}
                 {breadcrumbHover === currentTechInfo.category && (
@@ -180,7 +276,10 @@ export default function Header() {
                               : 'text-gray-300 hover:bg-red-900 hover:text-red-200'
                           }`}
                         >
-                          {data.title}
+                          <div className="font-medium">{data.title}</div>
+                          <div className="text-xs text-gray-400 mt-1 line-clamp-2">
+                            {tipQuotes[slug] || getTechPriestQuote(slug, data.title)}
+                          </div>
                         </Link>
                       );
                     })}
@@ -203,17 +302,24 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {Object.entries(technologyCategories).map(([category, slugs], index) => (
-              <div key={category} className="relative" ref={el => dropdownRefs.current[category] = el}>
-                <button
-                  onClick={() => toggleDropdown(category)}
-                  className="flex items-center space-x-1 text-red-400 hover:text-red-300 transition-colors font-mono"
-                >
-                  <span>{category}</span>
-                  <ChevronDown 
-                    size={16} 
-                    className={`transition-transform ${openDropdown === category ? 'rotate-180' : ''}`}
-                  />
-                </button>
+              <div key={category} className="relative" ref={el => { dropdownRefs.current[category] = el; }}>
+                <div className="flex items-center">
+                  <Link
+                    href={`/category/${category.toLowerCase().replace(/\s+/g, '-')}`}
+                    className="text-red-400 hover:text-red-300 transition-colors font-mono mr-1"
+                  >
+                    {category}
+                  </Link>
+                  <button
+                    onClick={() => toggleDropdown(category)}
+                    className="text-red-400 hover:text-red-300 transition-colors"
+                  >
+                    <ChevronDown 
+                      size={16} 
+                      className={`transition-transform ${openDropdown === category ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                </div>
 
                 {/* Dropdown Menu */}
                 {openDropdown === category && (
@@ -236,7 +342,7 @@ export default function Header() {
                         >
                           <div className="font-medium">{data.title}</div>
                           <div className="text-xs text-gray-400 mt-1 line-clamp-2">
-                            {data.benediction}
+                            {tipQuotes[slug] || getTechPriestQuote(slug, data.title)}
                           </div>
                         </Link>
                       );
@@ -269,7 +375,12 @@ export default function Header() {
                     Home
                   </Link>
                   <ChevronRight size={14} />
-                  <span className="text-red-400 font-medium">{currentTechInfo.category}</span>
+                  <Link 
+                    href={`/category/${currentTechInfo.category.toLowerCase().replace(/\s+/g, '-')}`}
+                    className="text-red-400 font-medium hover:text-red-300 transition-colors"
+                  >
+                    {currentTechInfo.category}
+                  </Link>
                   <ChevronRight size={14} />
                   <span className="text-red-300 font-semibold">{currentTechInfo.title}</span>
                 </nav>
@@ -279,16 +390,23 @@ export default function Header() {
             <div className="space-y-4">
               {Object.entries(technologyCategories).map(([category, slugs]) => (
                 <div key={category}>
-                  <button
-                    onClick={() => toggleDropdown(category)}
-                    className="flex items-center justify-between w-full text-left text-red-400 hover:text-red-300 transition-colors font-mono py-2"
-                  >
-                    <span className="font-semibold">{category}</span>
-                    <ChevronDown 
-                      size={16} 
-                      className={`transition-transform ${openDropdown === category ? 'rotate-180' : ''}`}
-                    />
-                  </button>
+                  <div className="flex items-center justify-between w-full py-2">
+                    <Link
+                      href={`/category/${category.toLowerCase().replace(/\s+/g, '-')}`}
+                      className="text-red-400 hover:text-red-300 transition-colors font-mono font-semibold"
+                    >
+                      {category}
+                    </Link>
+                    <button
+                      onClick={() => toggleDropdown(category)}
+                      className="text-red-400 hover:text-red-300 transition-colors ml-2"
+                    >
+                      <ChevronDown 
+                        size={16} 
+                        className={`transition-transform ${openDropdown === category ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+                  </div>
                   
                   {openDropdown === category && (
                     <div className="ml-4 mt-2 space-y-2 max-h-[70vh] overflow-y-auto scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-red-800 hover:scrollbar-thumb-red-700">
@@ -296,7 +414,7 @@ export default function Header() {
                         const data = codexDetails[slug];
                         if (!data) return null;
                         
-                        return (
+                      return (
                           <Link
                             key={slug}
                             href={`/codex/${slug}`}
@@ -306,10 +424,10 @@ export default function Header() {
                                 : 'text-gray-300 hover:bg-red-900 hover:text-red-200'
                             }`}
                           >
-                            <div className="font-medium">{data.title}</div>
-                            <div className="text-xs text-gray-400 mt-1">
-                              {data.benediction}
-                            </div>
+                          <div className="font-medium">{data.title}</div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            {tipQuotes[slug] || getTechPriestQuote(slug, data.title)}
+                          </div>
                           </Link>
                         );
                       })}

@@ -3,10 +3,11 @@ import type { AppProps } from "next/app";
 import Head from "next/head";
 import Header from "@/components/Header";
 import LoadingIndicator from "@/components/LoadingIndicator";
+import { LoadingProvider } from "@/components/LoadingContext";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <>
+    <LoadingProvider>
       <Header />
       <Head>
         <title>
@@ -102,6 +103,6 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
       <Component {...pageProps} />
       <LoadingIndicator />
-    </>
+    </LoadingProvider>
   );
 }

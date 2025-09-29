@@ -1272,4 +1272,121 @@ project/
   }
 };
 
+// Java Category Entries
+Object.assign(codexDetails, {
+  'java-gc-tuning': {
+    title: 'Java GC Tuning (G1/ZGC)',
+    summary: 'Optimize JVM garbage collectors (G1/ZGC) to reduce pause times and improve throughput for latency-sensitive and high-throughput services.',
+    why: `Garbage collection directly impacts latency and throughput. Proper GC selection and tuning (heap sizing, region sizes, pause-time goals) prevents long stop-the-world pauses.
+
+Use G1 for balanced throughput/latency and ZGC for ultra-low pause times in modern JDKs.`,
+    example: `# ✅ Good - G1GC with pause-time goals
+JAVA_TOOL_OPTIONS="-XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=30 -Xms2g -Xmx2g"
+
+# ✅ Good - ZGC for low-latency
+JAVA_TOOL_OPTIONS="-XX:+UseZGC -Xms2g -Xmx2g"
+
+# 🛑 Bad - Tiny heap causes frequent GC
+JAVA_TOOL_OPTIONS="-Xms128m -Xmx128m"`,
+    whenNot: `Avoid aggressive tuning without metrics. Do not enable ZGC on very old JVMs or small memory services where overhead is not justified.`,
+    benediction: 'May the collectors sweep flawlessly, their pauses brief as servo-skull blinks, preserving the sacred flow of your threads.'
+  },
+  'java-jit-optimizations': {
+    title: 'JIT Optimizations and JVM Flags',
+    summary: 'Leverage HotSpot JIT (C1/C2) and safe JVM flags to warm up code paths, enable tiered compilation, and reduce startup/steady-state latency.',
+    why: `JIT compiles hot methods to optimized machine code. Tiered compilation speeds warmup while C2 delivers peak performance. Proper flags and stable code paths improve steady-state latency.`,
+    example: `# ✅ Good - Tiered compilation for fast warmup
+JAVA_TOOL_OPTIONS="-XX:+TieredCompilation -XX:+TieredStopAtLevel=4 -XX:+UseStringDeduplication"
+
+# Microbenchmark with JMH for realistic results
+@Benchmark
+public int sum() { return IntStream.range(0, 1000).sum(); }
+
+# 🛑 Bad - Disabling tiered compilation needlessly
+JAVA_TOOL_OPTIONS="-XX:-TieredCompilation"`,
+    whenNot: `Avoid speculative flags from blog posts without profiling. Do not tune JIT flags without reproducible benchmarks (e.g., JMH).`,
+    benediction: 'Let the JIT-tempests forge hot paths into blessed native speed, and may your warmup be swift.'
+  },
+  'java-threading-concurrency': {
+    title: 'Threading, Virtual Threads, and Concurrency',
+    summary: 'Use modern concurrency primitives, thread pools, and Java virtual threads (Project Loom) to scale I/O-bound workloads efficiently.',
+    why: `Blocking I/O wastes threads. Virtual threads map many fibers to few OS threads, dramatically increasing concurrency for I/O-heavy services. Correct pooling prevents resource exhaustion.`,
+    example: `// ✅ Good - Virtual threads executor (JDK 21+)
+try (var executor = java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor()) {
+  Future<String> f = executor.submit(() -> httpGet(url));
+}
+
+// ✅ Good - Bounded pool for CPU-bound tasks
+var pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+// 🛑 Bad - Unbounded threads
+var pool = Executors.newCachedThreadPool(); // may explode under load`,
+    whenNot: `Avoid virtual threads for CPU-bound tasks that are better served by a bounded pool.`,
+    benediction: 'May your threads be as numerous as the Omnissiah wills, yet never starve the sacred cores.'
+  },
+  'java-spring-boot-performance': {
+    title: 'Spring Boot Performance (Actuator/Micrometer)',
+    summary: 'Instrument services with Actuator and Micrometer, tune connection pools, enable HTTP/2, and cache where safe to reduce latency.',
+    why: `Observability reveals bottlenecks. Tuning HikariCP, enabling HTTP/2, and using caches reduces contention and round-trips. Micrometer exports consistent metrics across backends.`,
+    example: `# ✅ application.yml
+server:
+  http2: { enabled: true }
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 20
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+// Micrometer counter
+Counter requests = Counter.builder("requests.total").register(meterRegistry);
+requests.increment();
+
+# 🛑 Bad - No pooling, no metrics`,
+    whenNot: `Avoid caching dynamic, per-user data without invalidation. Do not expose sensitive Actuator endpoints publicly.`,
+    benediction: 'May your services reveal their inner workings, that you may purge latency with holy precision.'
+  },
+  'java-memory-profiling': {
+    title: 'Memory Profiling and Leak Detection',
+    summary: 'Use JFR, jmap, and profilers to find leaks, large object graphs, and allocation hot spots; fix with better structures and lifecycles.',
+    why: `Unbounded allocations and leaks degrade GC and throughput. Profilers and JFR show allocation sources and retained sizes to target true bottlenecks.`,
+    example: `# ✅ Good - Start with JFR
+java -XX:StartFlightRecording=name=app,filename=profile.jfr,dumponexit=true -jar app.jar
+
+# Heap dump on OOM
+JAVA_TOOL_OPTIONS="-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/dumps"
+
+# 🛑 Bad - Guessing leaks without data`,
+    whenNot: `Avoid heap dumps on tiny containers without disk space planning.`,
+    benediction: 'Illuminate the heap; let no heretical reference persist beyond its purpose.'
+  },
+  'java-graalvm-native-image': {
+    title: 'GraalVM Native Image',
+    summary: 'Compile Java apps to native binaries for instant startup and lower memory usage; ideal for serverless and CLIs.',
+    why: `Native Image cuts startup time and RSS drastically by ahead-of-time compilation. Great for short-lived processes; may trade peak throughput for startup gains.`,
+    example: `# ✅ Good - Native image build
+gu build -jar app.jar -H:Name=app-native --no-fallback
+
+# 🛑 Bad - Expecting higher peak throughput than HotSpot JIT in all cases`,
+    whenNot: `Avoid when you rely on extensive dynamic class loading or JVMTI features unsupported by Native Image.`,
+    benediction: 'May your binaries start with the swiftness of a lasbolt, conserving memory for the greater work.'
+  },
+  'java-reactive-programming': {
+    title: 'Reactive Streams (Project Reactor)',
+    summary: 'Adopt non-blocking backpressure-aware streams to handle massive I/O with stable resource usage.',
+    why: `Reactive pipelines prevent thread exhaustion under load by composing async flows with backpressure. Ideal for latency-sensitive I/O services.`,
+    example: `// ✅ Good - Reactor pipeline
+Mono<User> user = userClient.getUser(id);
+Mono<Orders> orders = orderClient.getOrders(id);
+return Mono.zip(user, orders).map(tuple -> combine(tuple.getT1(), tuple.getT2()));
+
+// 🛑 Bad - Blocking calls on event loops`,
+    whenNot: `Avoid for simple endpoints where imperative code is clearer and sufficient.`,
+    benediction: 'Let the streams flow without blockage, and may backpressure keep your resources in sacred balance.'
+  }
+});
+
 export default codexDetails;
