@@ -205,8 +205,12 @@ export default function Codex({ optimizations }) {
     // Randomize starting quote after hydration
     setQuoteIndex(Math.floor(Math.random() * techpriestQuotes.length));
     // Shuffle optimizations after hydration so order changes on each load
+    // Filter out web development basics from randomized display
     setShuffledOptimizations(prev => {
-      const arr = [...optimizations];
+      const webBasicsSlugs = ['web-fundamentals-html', 'web-fundamentals-css', 'web-fundamentals-javascript', 'web-development-tools', 'web-development-frameworks', 'web-development-backend', 'web-development-practice'];
+      const filteredOptimizations = optimizations.filter(opt => !webBasicsSlugs.includes(opt.slug));
+      
+      const arr = [...filteredOptimizations];
       for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         const tmp = arr[i];

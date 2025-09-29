@@ -163,6 +163,9 @@ export default function Header() {
   const currentSlug = Array.isArray(router.query.slug)
     ? router.query.slug[0]
     : router.query.slug ?? '';
+  const currentCategoryParam = Array.isArray(router.query.category)
+    ? router.query.category[0]
+    : (router.query.category as string | undefined) ?? '';
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -234,11 +237,26 @@ export default function Header() {
 
   const currentTechInfo = getCurrentTechInfo();
 
+  // Map route category param to display label used across the site
+  const categoryDisplayMap: Record<string, string> = {
+    'react': 'React',
+    'next.js': 'Next.js',
+    'performance': 'Performance',
+    'node.js': 'Node.js',
+    'typescript': 'TypeScript',
+    'python': 'Python',
+    'java': 'Java',
+    'web-development-basics': 'Web Development Basics'
+  };
+  const currentCategoryDisplay = currentCategoryParam
+    ? categoryDisplayMap[currentCategoryParam] || currentCategoryParam
+    : '';
+
   return (
     <header className="bg-black border-b border-red-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumbs */}
-        {currentTechInfo && (
+        {(currentTechInfo || currentCategoryDisplay) && (
           <div className="py-2 border-b border-red-800/50">
             <nav className="flex items-center space-x-2 text-sm text-gray-400">
               <Link href="/" className="flex items-center hover:text-red-400 transition-colors">
@@ -246,48 +264,50 @@ export default function Header() {
                 Home
               </Link>
               <ChevronRight size={14} />
-              <div 
+              {/* Category crumb (always visible on category and detail pages) */}
+              <div
                 className="relative"
-                ref={el => { breadcrumbRefs.current[currentTechInfo.category] = el; }}
-                onMouseEnter={() => handleBreadcrumbHover(currentTechInfo.category)}
+                ref={el => {
+                  const key = currentTechInfo?.category || currentCategoryDisplay;
+                  if (key) breadcrumbRefs.current[key] = el;
+                }}
+                onMouseEnter={() => handleBreadcrumbHover(currentTechInfo?.category || currentCategoryDisplay)}
                 onMouseLeave={handleBreadcrumbLeave}
               >
-                <Link 
-                  href={`/category/${currentTechInfo.category.toLowerCase().replace(/\s+/g, '-')}`}
+                <Link
+                  href={`/category/${(currentTechInfo?.category || currentCategoryDisplay).toLowerCase().replace(/\s+/g, '-')}`}
                   className="text-red-400 font-medium cursor-pointer hover:text-red-300 transition-colors"
                 >
-                  {currentTechInfo.category}
+                  {currentTechInfo?.category || currentCategoryDisplay}
                 </Link>
-                
-                {/* Breadcrumb Dropdown */}
-                {breadcrumbHover === currentTechInfo.category && (
-                  <div className="absolute top-full left-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-gray-900 border border-red-800 rounded-lg shadow-lg py-1 z-50 max-h-[85vh] overflow-y-auto scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-red-800 hover:scrollbar-thumb-red-700">
-                    {technologyCategories[currentTechInfo.category]?.map(slug => {
-                      const data = codexDetails[slug];
-                      if (!data) return null;
-                      
-                      return (
-                        <Link
-                          key={slug}
-                          href={`/codex/${slug}`}
-                          className={`block px-3 py-1.5 text-sm transition-colors ${
-                            isActive(slug)
-                              ? 'bg-red-700 text-red-100 font-semibold'
-                              : 'text-gray-300 hover:bg-red-900 hover:text-red-200'
-                          }`}
-                        >
-                          <div className="font-medium">{data.title}</div>
-                          <div className="text-xs text-gray-400 mt-1 line-clamp-2">
-                            {tipQuotes[slug] || getTechPriestQuote(slug, data.title)}
-                          </div>
-                        </Link>
-                      );
-                    })}
+
+                {/* Breadcrumb Dropdown: show all technology categories for quick switch */}
+                {breadcrumbHover === (currentTechInfo?.category || currentCategoryDisplay) && (
+                  <div className="absolute top-full left-0 mt-2 w-72 max-w-[calc(100vw-2rem)] bg-gray-900 border border-red-800 rounded-lg shadow-lg py-1 z-50">
+                    {Object.keys(technologyCategories).map(cat => (
+                      <Link
+                        key={cat}
+                        href={`/category/${cat.toLowerCase().replace(/\s+/g, '-')}`}
+                        className={`block px-3 py-1.5 text-sm transition-colors ${
+                          (currentTechInfo?.category || currentCategoryDisplay) === cat
+                            ? 'bg-red-700 text-red-100 font-semibold'
+                            : 'text-gray-300 hover:bg-red-900 hover:text-red-200'
+                        }`}
+                      >
+                        {cat}
+                      </Link>
+                    ))}
                   </div>
                 )}
               </div>
-              <ChevronRight size={14} />
-              <span className="text-red-300 font-semibold">{currentTechInfo.title}</span>
+
+              {/* Detail title crumb (only on detail pages) */}
+              {currentTechInfo && (
+                <>
+                  <ChevronRight size={14} />
+                  <span className="text-red-300 font-semibold">{currentTechInfo.title}</span>
+                </>
+              )}
             </nav>
           </div>
         )}
