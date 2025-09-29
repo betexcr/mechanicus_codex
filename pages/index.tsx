@@ -198,10 +198,23 @@ export async function getStaticProps() {
 export default function Codex({ optimizations }) {
   // Deterministic initial value to avoid SSR/client mismatch; randomize after mount
   const [quoteIndex, setQuoteIndex] = useState(0);
+  // Local state for randomized optimizations on each page load
+  const [shuffledOptimizations, setShuffledOptimizations] = useState(optimizations);
 
   useEffect(() => {
     // Randomize starting quote after hydration
     setQuoteIndex(Math.floor(Math.random() * techpriestQuotes.length));
+    // Shuffle optimizations after hydration so order changes on each load
+    setShuffledOptimizations(prev => {
+      const arr = [...optimizations];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
+      }
+      return arr;
+    });
     const interval = setInterval(() => {
       setQuoteIndex((prev) => (prev + 1) % techpriestQuotes.length);
     }, 13000);
@@ -353,17 +366,34 @@ export default function Codex({ optimizations }) {
             Sacred Optimization Techniques
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {optimizations.slice(0, 9).map(({ title, summary, slug, benediction }) => {
+            {shuffledOptimizations.slice(0, 9).map(({ title, summary, slug, benediction }) => {
               const slugStr = Array.isArray(slug) ? slug[0] : slug ?? "";
+              const categoryKey = getCategoryForSlug(slugStr);
+              const categoryDisplay = {
+                react: 'React',
+                next: 'Next.js',
+                performance: 'Performance',
+                node: 'Node.js',
+                typescript: 'TypeScript',
+                python: 'Python',
+                java: 'Java',
+                web: 'Web Development Basics',
+                misc: 'Misc'
+              }[categoryKey] || 'Misc';
               return (
                 <motion.div
                   key={slugStr}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ duration: 0.2 }}
-                  className="bg-gray-900 border border-red-800 p-6 rounded-2xl shadow-lg hover:shadow-red-600/40 transition-all cursor-pointer group"
+                  className="bg-gray-900 border border-red-800 p-6 rounded-2xl shadow-lg hover:shadow-red-600/40 transition-all cursor-pointer group relative"
                 >
                   <Link href={`/codex/${slugStr}`} className="block">
+                    <div className="absolute top-4 right-4">
+                      <span className="text-[10px] uppercase tracking-wide bg-gray-800 text-gray-300 border border-red-900 px-2 py-0.5 rounded">
+                        {categoryDisplay}
+                      </span>
+                    </div>
                     <h3 className="text-lg font-semibold text-red-400 mb-2 underline underline-offset-4 group-hover:text-red-300 transition-colors">
                       {title}
                     </h3>
