@@ -115,6 +115,7 @@ function getCategoryForSlug(slug: string) {
   if (slugGroups.node.includes(slug)) return 'node';
   if (slugGroups.typescript.includes(slug)) return 'typescript';
   if (slugGroups.python.includes(slug)) return 'python';
+  if (slugGroups.java.includes(slug)) return 'java';
   if (slugGroups.web.includes(slug)) return 'web';
   return 'misc';
 }
